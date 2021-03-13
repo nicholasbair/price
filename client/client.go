@@ -33,9 +33,9 @@ type PriceItem struct {
 }
 
 // StartPriceStream streams prices from Oanda for the provided instruments
-func StartPriceStream(c chan PriceEvent, accountId string, instrument string) {
-	req, reqErr := http.NewRequest("GET", getHost()+accountId+"/pricing/stream?instruments="+instrument, nil)
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("OANDA_TOKEN"))
+func StartPriceStream(c chan PriceEvent, accountId string, instruments string) {
+	req, reqErr := http.NewRequest("GET", getHost()+accountId+"/pricing/stream?instruments="+instruments, nil)
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("TOKEN"))
 	req.Header.Set("Accept-Datetime-Format", "UNIX")
 
 	if reqErr != nil {
@@ -46,7 +46,7 @@ func StartPriceStream(c chan PriceEvent, accountId string, instrument string) {
 
 	if respErr != nil || resp.StatusCode != 200 {
 		println("Restarting")
-		StartPriceStream(c, accountId, instrument)
+		StartPriceStream(c, accountId, instruments)
 	}
 
 	reader := bufio.NewReader(resp.Body)
@@ -60,7 +60,7 @@ func StartPriceStream(c chan PriceEvent, accountId string, instrument string) {
 			if closed := req.Close; !closed {
 				fmt.Println("Price: unable to close request")
 			}
-			StartPriceStream(c, accountId, instrument)
+			StartPriceStream(c, accountId, instruments)
 		}
 
 		c <- *p

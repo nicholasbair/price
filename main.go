@@ -12,8 +12,6 @@ func main() {
 
 	db := store.ConnectToDatabase()
 
-	fmt.Println(db)
-
 	setupErr := store.SetupTables(db)
 
 	if setupErr != nil {
@@ -23,7 +21,7 @@ func main() {
 
 	wait := make(chan bool)
 
-	handler.PriceStreamHandler(db, "001-001-2420587-001", "EUR_USD")
+	handler.PriceStreamHandler(db, config.GetEnv("ACCOUNT"), config.GetEnv("INSTRUMENTS"))
 
 	<-wait
 }

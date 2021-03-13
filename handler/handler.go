@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"price/client"
 	"price/store"
 	"strconv"
@@ -27,6 +27,8 @@ func PriceStreamHandler(db *pg.DB, accountId string, instrument string) {
 			err := store.Insert(db, &price)
 			if err != nil {
 				fmt.Println("INSERT ERROR", err)
+			} else {
+				fmt.Println("INSERT: ", price.Instrument, price.Time)
 			}
 		}
 	}
