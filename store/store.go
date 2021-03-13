@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
 	"price/client"
@@ -15,13 +16,13 @@ func ConnectToDatabase() *pg.DB {
 		})
 		return db
 	} else {
-		db := pg.Connect(&pg.Options{
-			User:     config.GetEnv("DB_USER"),
-			Password: config.GetEnv("DB_PASSWORD"),
-			Database: config.GetEnv("DB_NAME"),
-			Addr:     config.GetEnv("DB_ADDR"),
-		})
-		return db
+		opt, err := pg.ParseURL(config.GetEnv("DB_CONNECTION_STRING"))
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		return pg.Connect(opt)
 	}
 }
 

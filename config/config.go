@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/joho/godotenv"
 	"os"
-	"strings"
 )
 
 /* Contents of .env file
@@ -11,10 +10,7 @@ TOKEN=1234
 ACCOUNT=001-001-2420587-001
 INSTRUMENTS=EUR_USD,USD_SEK
 BACKTEST=true
-DB_USER=trade_db
-DB_PASSWORD=pass
-DB_NAME=goprice
-DB_ADDR=...
+DB_CONNECTION_STRING=...
 */
 
 func LoadEnv() {
@@ -31,15 +27,6 @@ func GetEnv(key string) string {
 	}
 
 	return val
-}
-
-func GetEnvs(key string) []string {
-	val := os.Getenv(key)
-	if val == "" {
-		panic("ENV var missing " + key)
-	}
-
-	return strings.Split(val, ",")
 }
 
 func IsBacktest() bool {

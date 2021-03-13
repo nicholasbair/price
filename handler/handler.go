@@ -8,9 +8,9 @@ import (
 	"strconv"
 )
 
-func PriceStreamHandler(db *pg.DB, accountId string, instrument string) {
+func PriceStreamHandler(db *pg.DB, accountId string, instrument string, token string) {
 	p := make(chan client.PriceEvent)
-	go client.StartPriceStream(p, accountId, instrument)
+	go client.StartPriceStream(p, accountId, instrument, token)
 
 	for priceEvent := range p {
 		if priceEvent.Tradeable && priceEvent.Type != "HEARTBEAT" {
