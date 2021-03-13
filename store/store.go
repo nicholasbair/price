@@ -8,14 +8,14 @@ import (
 
 func ConnectToDatabase() *pg.DB {
 	db := pg.Connect(&pg.Options{
-		User: "postgres",
+		User:     "postgres",
+		Database: "postgres",
 	})
-	//defer db.Close()
 	return db
 }
 
-func Insert(db *pg.DB, record interface{}) error {
-	_, err = db.Model(record).Insert()
+func Insert(db *pg.DB, record *client.PriceEvent) error {
+	_, err := db.Model(record).Insert()
 	if err != nil {
 		return err
 	}
@@ -23,17 +23,15 @@ func Insert(db *pg.DB, record interface{}) error {
 }
 
 func SetupTables(db *pg.DB) error {
-	models := []interface{}{
-		(*client.Price(nil),
+	var p client.PriceEvent
+
+	err := db.Model(&p).CreateTable(&orm.CreateTableOptions{
+		Temp:        false,
+		IfNotExists: true,
+	})
+	if err != nil {
+		return err
 	}
 
-	for _, model := range models {
-		err := db.Model(model).CreateTable(&orm.CreateTableOptions{
-			Temp: true,
-		})
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }

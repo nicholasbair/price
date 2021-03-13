@@ -9,28 +9,6 @@ import (
 	"price/config"
 )
 
-package client
-
-import (
-"bufio"
-"encoding/json"
-"fmt"
-"net/http"
-"os"
-"trade/config"
-)
-
-// Transformed / flattened price
-type Price struct {
-	Type       string
-	Time       string
-	Bid        float32
-	Ask        float32
-	Tradeable  bool
-	Instrument string
-}
-
-// Raw price event from Oanda
 type PriceEvent struct {
 	Type       string      `json:"type"`
 	Time       string      `json:"time"`

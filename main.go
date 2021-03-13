@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"price/handler"
 	"price/store"
@@ -17,6 +18,7 @@ func main() {
 	setupErr := store.SetupTables(db)
 
 	if setupErr != nil {
+		fmt.Println(setupErr)
 		panic("ERR setting up DB tables")
 	}
 

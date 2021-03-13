@@ -12,18 +12,9 @@ func PriceStreamHandler(db *pg.DB, accountId string, instrument string) {
 	p := make(chan client.PriceEvent)
 	go client.StartPriceStream(p, accountId, instrument)
 
-	for priceEvent := range p {
-		if priceEvent.Tradeable && priceEvent.Type != "HEARTBEAT" {
-			price := client.Price{
-				Type:       "PRICE",
-				Time:       priceEvent.Time,
-				Bid:        strToFloat(priceEvent.Bids[0].Price),
-				Ask:        strToFloat(priceEvent.Asks[0].Price),
-				Tradeable:  priceEvent.Tradeable,
-				Instrument: instrument,
-			}
-
-			err := store.Insert(db, price)
+	for price := range p {
+		if price.Tradeable && price.Type != "HEARTBEAT" {
+			err := store.Insert(db, &price)
 			if err != nil {
 				fmt.Println("INSERT ERROR", err)
 			}
