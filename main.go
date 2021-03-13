@@ -2,18 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
+	"price/config"
 	"price/handler"
 	"price/store"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
-	}
+	config.LoadEnv()
 
 	db := store.ConnectToDatabase()
+
+	fmt.Println(db)
 
 	setupErr := store.SetupTables(db)
 

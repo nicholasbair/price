@@ -20,7 +20,16 @@ func LoadEnv() {
 	}
 }
 
-func GetEnv(key string) []string {
+func GetEnv(key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		panic("ENV var missing " + key)
+	}
+
+	return val
+}
+
+func GetEnvs(key string) []string {
 	val := os.Getenv(key)
 	if val == "" {
 		panic("ENV var missing " + key)

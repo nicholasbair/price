@@ -9,6 +9,16 @@ import (
 	"price/config"
 )
 
+// Transformed / flattened price
+type Price struct {
+	Type       string
+	Time       float32
+	Bid        float32
+	Ask        float32
+	Tradeable  bool
+	Instrument string
+}
+
 type PriceEvent struct {
 	Type       string      `json:"type"`
 	Time       string      `json:"time"`

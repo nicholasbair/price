@@ -4,17 +4,28 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"price/client"
+	"price/config"
 )
 
 func ConnectToDatabase() *pg.DB {
-	db := pg.Connect(&pg.Options{
-		User:     "postgres",
-		Database: "postgres",
-	})
-	return db
+	if config.IsBacktest() {
+		db := pg.Connect(&pg.Options{
+			User:     "postgres",
+			Database: "postgres",
+		})
+		return db
+	} else {
+		db := pg.Connect(&pg.Options{
+			User:     config.GetEnv("DB_USER"),
+			Password: config.GetEnv("DB_PASSWORD"),
+			Database: config.GetEnv("DB_NAME"),
+			Addr:     config.GetEnv("DB_ADDR"),
+		})
+		return db
+	}
 }
 
-func Insert(db *pg.DB, record *client.PriceEvent) error {
+func Insert(db *pg.DB, record *client.Price) error {
 	_, err := db.Model(record).Insert()
 	if err != nil {
 		return err
@@ -23,7 +34,7 @@ func Insert(db *pg.DB, record *client.PriceEvent) error {
 }
 
 func SetupTables(db *pg.DB) error {
-	var p client.PriceEvent
+	var p client.Price
 
 	err := db.Model(&p).CreateTable(&orm.CreateTableOptions{
 		Temp:        false,
