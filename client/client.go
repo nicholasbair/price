@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"price/config"
+	"runtime"
 )
 
 // Transformed / flattened price
 type Price struct {
+	Id         int64
 	Type       string
 	Time       float32
 	Bid        float32
@@ -44,6 +46,7 @@ func StartPriceStream(c chan PriceEvent, accountId string, instrument string, to
 
 	if respErr != nil || resp.StatusCode != 200 {
 		fmt.Println("Restarting due to", respErr, resp.StatusCode)
+		runtime.GC()
 		StartPriceStream(c, accountId, instrument, token)
 	}
 
@@ -58,6 +61,7 @@ func StartPriceStream(c chan PriceEvent, accountId string, instrument string, to
 			if closed := req.Close; !closed {
 				fmt.Println("Price: unable to close request")
 			}
+			runtime.GC()
 			StartPriceStream(c, accountId, instrument, token)
 		}
 
