@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-func PriceStreamHandler(db *pg.DB, accountId string, instrument string, token string) {
+func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token string) {
 	p := make(chan client.PriceEvent)
-	go client.StartPriceStream(p, accountId, instrument, token)
+	go client.StartPriceStream(p, accountId, instruments, token)
 
 	for priceEvent := range p {
 		if priceEvent.Tradeable && priceEvent.Type != "HEARTBEAT" {
@@ -26,7 +26,7 @@ func PriceStreamHandler(db *pg.DB, accountId string, instrument string, token st
 					Bid:        strToFloat(priceEvent.Bids[0].Price),
 					Ask:        strToFloat(priceEvent.Asks[0].Price),
 					Tradeable:  priceEvent.Tradeable,
-					Instrument: instrument,
+					Instrument: priceEvent.Instrument,
 				}
 
 				err := store.Insert(db, &price)

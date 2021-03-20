@@ -5,7 +5,6 @@ import (
 	"price/config"
 	"price/handler"
 	"price/store"
-	"strings"
 )
 
 func main() {
@@ -22,9 +21,7 @@ func main() {
 
 	wait := make(chan bool)
 
-	for _, inst := range strings.Split(config.GetEnv("INSTRUMENTS"), ",") {
-		handler.PriceStreamHandler(db, config.GetEnv("ACCOUNT"), inst, config.GetEnv("TOKEN"))
-	}
+	go handler.PriceStreamHandler(db, config.GetEnv("ACCOUNT"), config.GetEnv("INSTRUMENTS"), config.GetEnv("TOKEN"))
 
 	<-wait
 }
