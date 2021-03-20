@@ -7,13 +7,14 @@ import (
 	"net/http"
 	"price/config"
 	"runtime"
+	"time"
 )
 
 // Transformed / flattened price
 type Price struct {
 	Id         int64
 	Type       string
-	Time       float32
+	Time       time.Time
 	Bid        float32
 	Ask        float32
 	Tradeable  bool
@@ -37,7 +38,6 @@ type PriceItem struct {
 func StartPriceStream(c chan PriceEvent, accountId string, instrument string, token string) {
 	req, reqErr := http.NewRequest("GET", getHost()+accountId+"/pricing/stream?instruments="+instrument, nil)
 	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Accept-Datetime-Format", "UNIX")
 	if reqErr != nil {
 		panic("Unable to configure request for price stream")
 	}

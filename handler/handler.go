@@ -6,6 +6,7 @@ import (
 	"price/client"
 	"price/store"
 	"strconv"
+	"time"
 )
 
 func PriceStreamHandler(db *pg.DB, accountId string, instrument string, token string) {
@@ -15,21 +16,29 @@ func PriceStreamHandler(db *pg.DB, accountId string, instrument string, token st
 	for priceEvent := range p {
 		if priceEvent.Tradeable && priceEvent.Type != "HEARTBEAT" {
 
-			price := client.Price{
-				Type:       "PRICE",
-				Time:       strToFloat(priceEvent.Time),
-				Bid:        strToFloat(priceEvent.Bids[0].Price),
-				Ask:        strToFloat(priceEvent.Asks[0].Price),
-				Tradeable:  priceEvent.Tradeable,
-				Instrument: instrument,
+			t, timeErr := time.Parse(time.RFC3339, priceEvent.Time)
+			var price client.Price
+
+			if timeErr == nil {
+				price = client.Price{
+					Type:       "PRICE",
+					Time:       t,
+					Bid:        strToFloat(priceEvent.Bids[0].Price),
+					Ask:        strToFloat(priceEvent.Asks[0].Price),
+					Tradeable:  priceEvent.Tradeable,
+					Instrument: instrument,
+				}
+
+				err := store.Insert(db, &price)
+				if err != nil {
+					fmt.Println("INSERT ERROR", err)
+				} else {
+					fmt.Println("INSERT: ", price.Instrument)
+				}
+			} else {
+				fmt.Println("ERROR", timeErr)
 			}
 
-			err := store.Insert(db, &price)
-			if err != nil {
-				fmt.Println("INSERT ERROR", err)
-			} else {
-				fmt.Println("INSERT: ", price.Instrument, price.Time)
-			}
 		}
 	}
 }
