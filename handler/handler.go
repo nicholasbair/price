@@ -29,11 +29,13 @@ func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token s
 					Instrument: priceEvent.Instrument,
 				}
 
-				err := store.Insert(db, &price)
-				if err != nil {
-					fmt.Println("INSERT ERROR", err)
-				} else {
-					fmt.Println("INSERT: ", price.Instrument)
+				if price.Bid != 0.0 && price.Ask != 0.0 {
+					err := store.Insert(db, &price)
+					if err != nil {
+						fmt.Println("INSERT ERROR", err)
+					} else {
+						fmt.Println("INSERT: ", price.Instrument)
+					}
 				}
 			} else {
 				fmt.Println("ERROR", timeErr)
@@ -44,9 +46,8 @@ func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token s
 }
 
 // -- Private --
-func strToFloat(str string) float32 {
-	flt64, err := strconv.ParseFloat(str, 32)
-	flt := float32(flt64)
+func strToFloat(str string) float64 {
+	flt, err := strconv.ParseFloat(str, 32)
 
 	if err != nil {
 		panic("Unable to convert float " + str)

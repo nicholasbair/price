@@ -15,8 +15,8 @@ type Price struct {
 	Id         int64
 	Type       string
 	Time       time.Time
-	Bid        float32
-	Ask        float32
+	Bid        float64
+	Ask        float64
 	Tradeable  bool
 	Instrument string
 }
