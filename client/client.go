@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"price/config"
-	"runtime"
 	"time"
 )
 
@@ -49,9 +48,9 @@ func StartPriceStream(c chan PriceEvent, accountId string, instruments string, t
 	resp, respErr := http.DefaultClient.Do(req)
 
 	if respErr != nil || resp.StatusCode != 200 {
-		fmt.Println("Restarting due to", respErr, resp.StatusCode)
-		runtime.GC()
-		StartPriceStream(c, accountId, instruments, token)
+		fmt.Println("Stream error", resp.StatusCode, respErr)
+		close(c)
+		return
 	}
 
 	reader := bufio.NewReader(resp.Body)
@@ -62,11 +61,9 @@ func StartPriceStream(c chan PriceEvent, accountId string, instruments string, t
 		if err := json.Unmarshal([]byte(line), &p); err != nil {
 			fmt.Println("Price: Can't unmarshal:", err)
 			fmt.Println("Line:", line)
-			if closed := req.Close; !closed {
-				fmt.Println("Price: unable to close request")
-			}
-			runtime.GC()
-			StartPriceStream(c, accountId, instruments, token)
+			_ = req.Close
+			close(c)
+			return
 		}
 
 		c <- *p

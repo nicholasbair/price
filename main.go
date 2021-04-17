@@ -21,7 +21,7 @@ func main() {
 
 	wait := make(chan bool)
 
-	go handler.PriceStreamHandler(db, config.GetEnv("ACCOUNT"), config.GetEnv("INSTRUMENTS"), config.GetEnv("TOKEN"))
+	go handler.PriceStreamHandler(db, config.GetEnv("ACCOUNT"), config.GetEnv("INSTRUMENTS"), config.GetEnv("TOKEN"), 0)
 
 	<-wait
 }

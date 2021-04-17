@@ -9,11 +9,19 @@ import (
 	"time"
 )
 
-func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token string) {
+const maxRestartWait = 60
+
+func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token string, restartCount int) {
 	p := make(chan client.PriceEvent)
 	go client.StartPriceStream(p, accountId, instruments, token)
 
 	for priceEvent := range p {
+
+		// Reset the counter if receiving events in the channel
+		if restartCount != 0 {
+			restartCount = 0
+		}
+
 		if priceEvent.Tradeable && priceEvent.Type != "HEARTBEAT" {
 
 			t, timeErr := time.Parse(time.RFC3339, priceEvent.Time)
@@ -43,6 +51,10 @@ func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token s
 
 		}
 	}
+	newCount := getNewCount(restartCount, maxRestartWait)
+	fmt.Println("PRICE: Restarting in", newCount)
+	time.Sleep(time.Duration(newCount) * time.Second)
+	PriceStreamHandler(db, accountId, instruments, token, newCount)
 }
 
 // -- Private --
@@ -53,4 +65,11 @@ func strToFloat(str string) float64 {
 		panic("Unable to convert float " + str)
 	}
 	return flt
+}
+
+func getNewCount(current int, max int) int {
+	if current >= max {
+		return max
+	}
+	return current + 1
 }
