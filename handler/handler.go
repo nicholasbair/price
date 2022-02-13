@@ -41,8 +41,6 @@ func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token s
 					err := store.Insert(db, &price)
 					if err != nil {
 						log.Println("INSERT ERROR", err)
-					} else {
-						log.Println("INSERT: ", price.Instrument)
 					}
 				}
 			} else {
