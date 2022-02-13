@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/go-pg/pg/v10"
+	"log"
 	"price/client"
 	"price/store"
 	"strconv"
@@ -40,19 +41,19 @@ func PriceStreamHandler(db *pg.DB, accountId string, instruments string, token s
 				if price.Bid != 0.0 && price.Ask != 0.0 {
 					err := store.Insert(db, &price)
 					if err != nil {
-						fmt.Println("INSERT ERROR", err)
+						log.Println("INSERT ERROR", err)
 					} else {
-						fmt.Println("INSERT: ", price.Instrument)
+						log.Println("INSERT: ", price.Instrument)
 					}
 				}
 			} else {
-				fmt.Println("ERROR", timeErr)
+				log.Println("ERROR", timeErr)
 			}
 
 		}
 	}
 	newCount := getNewCount(restartCount, maxRestartWait)
-	fmt.Println("PRICE: Restarting in", newCount)
+	log.Println("PRICE: Restarting in", newCount)
 	time.Sleep(time.Duration(newCount) * time.Second)
 	PriceStreamHandler(db, accountId, instruments, token, newCount)
 }

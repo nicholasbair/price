@@ -3,7 +3,7 @@ package client
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"price/config"
 	"time"
@@ -48,7 +48,7 @@ func StartPriceStream(c chan PriceEvent, accountId string, instruments string, t
 	resp, respErr := http.DefaultClient.Do(req)
 
 	if respErr != nil || resp.StatusCode != 200 {
-		fmt.Println("Stream error", resp.StatusCode, respErr)
+		log.Println("Stream error", resp.StatusCode, respErr)
 		close(c)
 		return
 	}
@@ -59,8 +59,8 @@ func StartPriceStream(c chan PriceEvent, accountId string, instruments string, t
 		line, _ := reader.ReadBytes('\n')
 
 		if err := json.Unmarshal([]byte(line), &p); err != nil {
-			fmt.Println("Price: Can't unmarshal:", err)
-			fmt.Println("Line:", line)
+			log.Println("Price: Can't unmarshal:", err)
+			log.Println("Line:", line)
 			_ = req.Close
 			close(c)
 			return
