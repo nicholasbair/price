@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/go-pg/pg/v10"
 	"log"
 	"price/client"
